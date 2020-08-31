@@ -1,4 +1,4 @@
-Objetivo, primeiros passos para iniciar a produção da distribuição CEUB OS:
+Objetivo, primeiros passos para iniciar a produção da distribuição CEUB-OS:
 
 Pré-requisitos
    1. Debian
