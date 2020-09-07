@@ -39,176 +39,38 @@ Coloca entre 30 e 50GB de HD virtual - Em rede, coloca em modo bridge - na insta
     • Servidor SSH
 Verifique o IP da máquina virtual instalada e para facilitar as ações (como ter opção de copiar e colocar) acesse esta máquina via SSH, exemplo:
 
-# ssh live@10.0.2.15
-
-Repositório adicional
-Adicionar em /etc/apt/sources.list o repositório:
-deb http://ftp.br.debian.org/debian/ buster main contrib non-free
-
-Atualize a lista de repositórios:
-# apt-get update
-
-Instalação do live-build
-# apt-get install live-build live-manual live-config schroot
-
-Criando o diretório de trabalho
-# mkdir /home/live/live
-
-Acesse o diretório criado e execute o comando:
-# lb config
-
-Observe que será criado três diretórios:
-    • auto
-    • config
-    • local
-
-Agora execute o comando lb buildmas detalhe:
-Este comando não funciona via SSH por causa do diretório path do chroot.
-# lb build
-
-Este comando vai gerar uma imagem hibrida do sistema. A primeira vez que executamos este comando o processo demora, por que é feito download da imagem no site do debian.
-
-Quando concluir, você terá algo como : live-image-amd64.hybrid.iso nos seu diretório.
-Você pode copiar esta imagem para seu sistema host e testá-la com o virtualbox. Para puxá-la com o scp, use o comando:
-# scp live-image-amd64.hybrid.iso aderbal@10.0.2.15:/tmp
-
-Você pode testar no virtualbox esta imagem, que vai estar funcionando apenas o modo live. 
-
-As opções (install e graphical install) ainda não foram habilitadas.
-O diretório cache
-
-A partir de agora não será mais necessário fazer o download de todos os pacotes no site do debian, já que estão informações estão no diretório cache.
-
-Para limpar o projeto anterior e iniciarmos de fato a criação de nossa remasterização, utilize o comando:
-# lb clean
-
-Este comando vai limpar os arquivos e a imagem hibrida, gerada anteriormente.
-Permitir a instalação do Debian
-# lb config --debian-installer live
-
-A configuração fica no arquivo /config/binary.
-Permitir a instalação em modo gráfico
-# lb config --debian-installer-gui true
-
-No comando abaixo devemos colocar o nome do instalador, referente a distribuição debian que estamos usando. No meu caso:
-lb config --debian-installer-distribution buster
-
-Permitir ou não o memtest
-O memtest é uma opção para ativar o teste de memória no grub. Uma opção, não muito utilizada que vamos desabilitar:
-lb config --memtest none
-
-Finalizar imagem
-# lb clean
-# lb build
-
-Observe que o tempo será bem mais rápido do que a primeira vez, já que os arquivos estão em cache, ele somente vai baixar os arquivos do instalador do debian.
-
-Definindo os repositórios padrão
-Para definir os repositórios que serão padrão na live e após sua instalação, como por exemplo, os repositórios non-free (que contém software proprietário), utilize:
-# lb config --archive-areas "main contrib non-free"
-
-Para persistir após a instalação:
-# lb config --parent-archive-areas "main contrib non-free"
-
-Habilitar por padrão o repositório de segurança (security):
-# lb config --security true
-Comandos essenciais
+# ceubos-core
+CeubOS Core Team 
 
 
-Definir o tipo de sistema da imagem:
-# lb config –parent-distribution buster``
+# Atualizar seus repositorios para o backports
+\</etc/apt/sources.list\> \
+deb http://deb.debian.org/debian buster-backports main contrib non-free \
+deb-src http://deb.debian.org/debian buster-backports main contrib non-free 
 
-Habilitar para que os índices sejam atualizados automaticamente (apt-get update):
-# lb config --apt-indices true
-
-Definir o gestor de pacotes padrão:
-# lb config --apt apt
-
-Definir a arquitetura do sistema:
-# lb config --architectures amd64
-
-Definir a imagem que usaremos na live:
-# lb config --binary-images iso-hybrid
-
-Definir o nome da imagem:
-# lb config --image-name remaster
-
-Definir o autor da imagem:
-# lb config --iso-publisher "Aderbal Botelho <aderbal@educatux.com.br>"
-
-Definir um shell interativo durante o processo de compilação, para alguma alteração na imagem live:
-# lb config --interactive shell
-
-Adicionando interface gráfica
-Crie um arquivo de lista para os aplicativos que irá instalar:
-
-# nano config/package-lists/grafica.list.chroot
-
-Adicione os nomes dos pacotes. Vamos usar o xfce4: (ou cinnamon??).
-xfce4
-xfce4-indicator-plugin
-xfce4-power-manager
-xfce4-battery-plugin
-xfce4-datetime-plugin
-xfce4-mount-plugin
-xfce4-netload-plugin
-xfce4-wavelan-plugin
-xfce4-screenshooter
-xfce4-sensors-plugin
-xfce4-smartbookmark-plugin
-xfce4-timer-plugin
-xfce4-whiskermenu-plugin
-xfce4-goodies
-
-Crie outra lista com softwares diversos:
-# nano config/package-lists/diversos.list.chroot
-gdebi
-file-roller
-lsb-release
-build-essential
-module-assistant
-linux-headers-amd64
-gedit
-vlc
-mugshot
-ristretto
-nemo
-unrar-free
-rar
-file-roller
-p7zip
-unzip
-gnome-system-tools
-ssh
-net-tools
-gnome-calculator
-gcc
-quota
-engrampa
-libuser
-bash-completion
-evince
-pulseaudio-equalizer
-cups
-hplip
-accountsservice
-mugshot
-apt-transport-https
-network-manager
-network-manager-gnome
-net-tools
-
-Execute o comando:
-# lb clean
-
-Para limpar a as outras configurações e crie a iso :
-# lb build
-
-Ainda existe muito a se fazer
-Pacotes que precisaremos criar:
-
-Instalador;
-Tema visual;
-Pacotes (meta pacotes) temáticos (max 5 temas);
+Apos isso, atualizar os seus repostorios e a maquina
+`sudo apt update && sudo apt upgrade`
 
 
+# Instalar as dependencias
+`sudo apt install live-build live-manual live-config schroot`
+
+# Compilar sua primeira versao
+1. Clone o repositorio para sua maquina \
+`git clone https://github.com/francisco-pc7063/ceubos-core.git`
+2. Va para o diretorio que possui as instrucoes do live build \
+`cd ./ceubos-core/live`
+3. Dentro do repositorio, ha um script chamado **live.sh** executeu e depois mande o live-build construir a iso
+```
+./live.sh
+sudo lb build
+```
+4. Se o live-build conseguir executar sem erros, sera criado um arquivo chamado **live-image-amd64.hybrid.iso**
+Para executar novamente, sera necessario excluir o atual e buildar novamente:
+```
+sudo lb clean --all
+./live.sh
+sudo lb build
+```
+# Referencias
+https://live-team.pages.debian.net/live-manual/html/live-manual/about-manual.en.html
